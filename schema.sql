@@ -28,3 +28,29 @@ CREATE TABLE IF NOT EXISTS animals (
     FOREIGN KEY (owners_id)
       REFERENCES owners (id)
 );
+
+CREATE TABLE IF NOT EXISTS vets(
+  id SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  age NUMERIC NOT NULL,
+  date_of_graduation date NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS specializations(
+  vet_id INT,
+  species_id INT,
+  FOREIGN KEY (species_id)
+      REFERENCES species (id),
+  FOREIGN KEY (vet_id)
+      REFERENCES vets (id)
+);
+
+CREATE TABLE IF NOT EXISTS visits(
+  animal_id INT,
+  vet_id INT,
+  visit_date date,
+  FOREIGN KEY (animal_id)
+      REFERENCES animals (id),
+  FOREIGN KEY (vet_id)
+      REFERENCES vets (id)
+);
