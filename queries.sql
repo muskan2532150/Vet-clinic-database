@@ -47,8 +47,6 @@ SELECT name, max(escape_attempts) from animals where neutered = true or neutered
 select max(weight_kg),min(weight_kg) from animals group by species;
 select avg(escape_attempts) from animals WHERE EXTRACT(year from date_of_birth) between 1990 AND 2000;
 
--- JOIN QUERIES
--- What animals belong to Melody Pond?
 SELECT 
 an.name AS animal_name,
 ow.full_name AS owner_name 
@@ -57,7 +55,6 @@ INNER JOIN owners ow
 ON ow.id = an.owners_id 
 WHERE ow.full_name = 'Melody Pond';
 
--- List of all animals that are pokemon (their type is Pokemon).
 SELECT 
 an.name AS animal_name, 
 sp.name AS species 
@@ -66,7 +63,6 @@ INNER JOIN species sp
 ON sp.id = an.species_id
 WHERE sp.name = 'Pokemon';
 
--- List all owners and their animals, remember to include those that don't own any animal.
 SELECT
 ow.full_name as owner_name,
 an.name as animal_name
@@ -74,7 +70,6 @@ FROM owners ow
 LEFT JOIN animals an
 ON ow.id = an.owners_id
 
--- How many animals are there per species?
 SELECT 
 sp.name AS species_name,
 COUNT(an.name) AS animal_count
@@ -83,7 +78,6 @@ INNER JOIN species sp
 ON sp.id = an.species_id
 GROUP BY sp.name;
 
--- List all Digimon owned by Jennifer Orwell.
 SELECT 
 ow.full_name as owner_name,
 sp.name as species_name,
@@ -95,7 +89,6 @@ INNER JOIN species sp
 ON sp.id = an.owners_id
 WHERE ow.full_name = 'Jennifer Orwell';
 
--- List all animals owned by Dean Winchester that haven't tried to escape.
 SELECT 
 ow.full_name as owner_name,
 an.name as animal_name,
@@ -106,7 +99,6 @@ ON ow.id = an.owners_id
 WHERE an.escape_attempts = 0 
 AND ow.full_name = 'Dean Winchester';
 
--- Who owns the most animals?
 SELECT 
 COUNT(an.name) AS animal_count,
 ow.full_name AS owner_name 
@@ -116,3 +108,128 @@ ON ow.id = an.owners_id
 GROUP BY ow.full_name 
 ORDER BY MAX(an.name) DESC;
 
+
+SELECT 
+an.name as animal_name,
+ve.name as vet_name,
+vi.visit_date
+FROM animals an
+INNER JOIN visits vi
+ON an.id = vi.animal_id
+INNER JOIN vets ve
+ON ve.id = vi.vet_id
+WHERE ve.name = 'William Tatcher' 
+ORDER BY vi.visit_date DESC LIMIT 1;
+
+SELECT 
+ve.name AS vet_name,
+COUNT(an.name) AS animal_count
+FROM
+animals an
+INNER JOIN visits vi
+ON an.id = vi.animal_id
+INNER JOIN vets ve
+ON ve.id = vi.vet_id
+WHERE ve.name = 'Stephanie Mendez'
+GROUP BY ve.name;
+
+SELECT 
+DISTINCT 
+ve.name AS vet_name,
+sp.name AS animal_type 
+FROM
+vets ve
+LEFT JOIN specializations spe
+on ve.id = spe.vet_id 
+LEFT JOIN animals an 
+on spe.species_id = an.species_id 
+LEFT JOIN species sp
+ON  an.species_id = sp.id 
+ORDER BY ve.name;
+
+SELECT
+ve.name AS vet_name,
+an.name AS animal_name,
+vi.visit_date AS visit_date
+FROM
+animals an
+INNER JOIN visits vi
+ON an.id = vi.animal_id
+INNER JOIN vets ve
+ON ve.id = vi.vet_id
+WHERE ve.name = 'Stephanie Mendez' 
+AND 
+vi.visit_date BETWEEN '2020-04-01' AND '2020-08-30';
+
+SELECT
+an.name AS animal_name,
+COUNT(vi.animal_id) AS most_visits
+FROM
+animals an
+INNER JOIN visits vi
+ON an.id = vi.animal_id
+INNER JOIN vets ve
+ON ve.id = vi.vet_id
+GROUP BY an.name
+ORDER BY COUNT(vi.animal_id) DESC LIMIT 1;
+
+SELECT 
+an.name as animal_name,
+ve.name as vet_name,
+vi.visit_date
+FROM animals an
+INNER JOIN visits vi
+ON an.id = vi.animal_id
+INNER JOIN vets ve
+ON ve.id = vi.vet_id
+WHERE ve.name = 'Maisy Smith'
+ORDER BY visit_date ASC LIMIT 1;
+
+SELECT
+an.name AS animal_name,
+an.date_of_birth,
+an.escape_attempts,
+an.neutered,
+an.weight_kg,
+ve.name AS vet_name,
+ve.age,
+ve.date_of_graduation,
+vi.visit_date
+FROM
+animals an
+INNER JOIN visits vi
+ON an.id = vi.animal_id
+INNER JOIN vets ve
+ON ve.id = vi.vet_id
+ORDER BY vi.visit_date DESC LIMIT 1;
+
+SELECT
+ve.name AS vet_name,
+COUNT(vi.vet_id) AS visit_count
+FROM
+species sp
+RIGHT JOIN specializations spe
+ON sp.id = spe.species_id
+RIGHT JOIN vets ve
+ON ve.id = spe.vet_id
+RIGHT JOIN visits vi
+ON ve.id = vi.vet_id
+WHERE ve.name = 'Maisy Smith'
+GROUP BY ve.name;
+
+SELECT
+DISTINCT
+ve.name AS vet_name,
+an.name AS animal_name,
+MAX(sp.name) AS animal_type
+FROM
+animals an
+RIGHT JOIN visits vi
+ON an.id = vi.animal_id
+RIGHT JOIN species sp
+ON sp.id = an.species_id
+INNER JOIN vets ve
+ON ve.id = vi.vet_id
+WHERE ve.name = 'Maisy Smith' 
+GROUP BY ve.name, an.name
+ORDER BY an.name ASC LIMIT 1;
